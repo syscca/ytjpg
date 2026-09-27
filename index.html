@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ThumbForge — YouTube 封面设计器 · 1280×720</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+  <!-- ============ 顶栏 ============ -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">▶</div>
+      <div class="brand-name">Thumb<b>Forge</b></div>
+      <span class="brand-badge">1280×720</span>
+    </div>
+    <div class="top-actions">
+      <button class="tbtn" id="btn-undo" title="撤销 Ctrl+Z"><svg viewBox="0 0 24 24"><path d="M9 14H4V9m1 5a8 8 0 1 1 2.3 6.3"/></svg></button>
+      <button class="tbtn" id="btn-redo" title="重做 Ctrl+Y"><svg viewBox="0 0 24 24"><path d="M15 14h5V9m-1 5a8 8 0 1 0-2.3 6.3"/></svg></button>
+      <div class="zoom-wrap">
+        <button class="tbtn" id="btn-zoom-out">−</button>
+        <span id="zoom-label">100%</span>
+        <button class="tbtn" id="btn-zoom-in">+</button>
+        <button class="tbtn" id="btn-zoom-fit" title="适应画布">⊡</button>
+      </div>
+      <button class="btn-primary" id="btn-export">
+        <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+        导出封面
+      </button>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <!-- ============ 左侧图标栏 ============ -->
+    <nav class="icon-rail" id="icon-rail">
+      <button class="rail-btn active" data-panel="templates" title="模板">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        <span>模板</span>
+      </button>
+      <button class="rail-btn" data-panel="upload" title="上传">
+        <svg viewBox="0 0 24 24"><path d="M12 16V4m0 0L8 8m4-4l4 4M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+        <span>上传</span>
+      </button>
+      <button class="rail-btn" data-panel="cutout" title="抠图">
+        <svg viewBox="0 0 24 24"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2m0 8v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3.2"/></svg>
+        <span>抠图</span>
+      </button>
+      <button class="rail-btn" data-panel="text" title="文字">
+        <svg viewBox="0 0 24 24"><path d="M5 7V5h14v2M12 5v14M9 19h6"/></svg>
+        <span>文字</span>
+      </button>
+      <button class="rail-btn" data-panel="elements" title="素材">
+        <svg viewBox="0 0 24 24"><path d="M12 3l2.5 5.6L20 9.3l-4.2 3.8L17.2 19 12 15.8 6.8 19l1.4-5.9L4 9.3l5.5-.7L12 3z"/></svg>
+        <span>素材</span>
+      </button>
+      <button class="rail-btn" data-panel="adjust" title="调整">
+        <svg viewBox="0 0 24 24"><path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h7M15 18h5"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="13" cy="18" r="2"/></svg>
+        <span>调整</span>
+      </button>
+    </nav>
+
+    <!-- ============ 左侧功能面板 ============ -->
+    <aside class="side-panel" id="side-panel">
+      <!-- 模板 -->
+      <section class="panel-content active" data-panel="templates">
+        <h3 class="panel-title">优质模板</h3>
+        <p class="panel-desc">一键套用，点击图片占位即可替换为你的素材</p>
+        <div class="template-grid" id="template-grid"></div>
+      </section>
+
+      <!-- 上传 -->
+      <section class="panel-content" data-panel="upload">
+        <h3 class="panel-title">上传图片</h3>
+        <label class="dropzone" id="dropzone">
+          <input type="file" id="file-input" accept="image/*" multiple hidden>
+          <svg viewBox="0 0 24 24"><path d="M12 16V4m0 0L8 8m4-4l4 4M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+          <b>点击或拖拽图片到此处</b>
+          <span>支持 JPG / PNG / WebP</span>
+        </label>
+        <div class="upload-actions">
+          <button class="btn-block" id="btn-add-bg">设为背景（铺满 1280×720）</button>
+          <button class="btn-block ghost" id="btn-add-asset">添加为素材（可抠图）</button>
+        </div>
+        <div class="hint">
+          <b>提示</b>：添加人物或产品图后，到「抠图」面板一键去除背景，封面更专业。
+        </div>
+      </section>
+
+      <!-- 抠图 -->
+      <section class="panel-content" data-panel="cutout">
+        <h3 class="panel-title">智能抠图</h3>
+        <div id="cutout-idle">
+          <div class="hint">请先选中一张图片素材，然后选择抠图方式。<br>也可以先在「上传」面板添加图片。</div>
+        </div>
+        <div id="cutout-controls" class="hidden">
+          <div class="cutout-card ai">
+            <div class="cutout-card-head">
+              <b>✦ 智能抠图</b>
+              <span class="tag best">全程离线</span>
+            </div>
+            <p>神经网络在本机运行，照片不会上传。人物 / 商品 / 宠物 / 物体均适用，抠完可到右侧「抠图特效」加描边。</p>
+            <div class="field-row">
+              <button class="seg active" id="seg-engine-rmbg">高清 AI · 最强模型</button>
+              <button class="seg" id="seg-engine-person">极速人像 · 可商用</button>
+            </div>
+            <div class="field-row hidden" id="person-mode-row">
+              <button class="seg active" id="seg-model-0">近景自拍 / 半身</button>
+              <button class="seg" id="seg-model-1">全身 / 多人旅行</button>
+            </div>
+            <div class="field">
+              <label>边缘羽化 <span id="person-feather-val">2</span></label>
+              <input type="range" id="person-feather" min="0" max="10" value="2">
+            </div>
+            <div class="field">
+              <label>背景干净度 <span id="person-thr-val">24</span></label>
+              <input type="range" id="person-thr" min="10" max="120" value="24">
+            </div>
+            <p class="license-hint" id="engine-hint">高清模型 RMBG-1.4（44M 参数，首次加载约 44MB）：边缘最精细，授权限非商业使用；商用场景请切换「极速人像」（Apache-2.0）。</p>
+            <button class="btn-block primary" id="btn-ai-cutout">一键抠除背景</button>
+            <div class="progress hidden" id="ai-progress"><div class="bar"><i id="ai-progress-fill"></i></div><span id="ai-progress-text">准备中…</span></div>
+          </div>
+
+          <div class="cutout-card">
+            <div class="cutout-card-head"><b>色度键抠图</b><span class="tag">绿幕 / 纯色背景</span></div>
+            <p>背景是纯色（绿幕/白墙）时使用，自动取样边角颜色。</p>
+            <div class="field">
+              <label>容差 <span id="chroma-tol-val">42</span></label>
+              <input type="range" id="chroma-tol" min="0" max="200" value="42">
+            </div>
+            <div class="field">
+              <label>边缘羽化 <span id="chroma-feather-val">18</span></label>
+              <input type="range" id="chroma-feather" min="0" max="80" value="18">
+            </div>
+            <button class="btn-block" id="btn-chroma-cutout">自动取样并抠除</button>
+          </div>
+          <button class="btn-block ghost danger" id="btn-restore-original">恢复原图</button>
+        </div>
+      </section>
+
+      <!-- 文字 -->
+      <section class="panel-content" data-panel="text">
+        <h3 class="panel-title">英文字体</h3>
+        <p class="panel-desc">全部为 OFL 开源授权，可免费商用 · 点击添加，右侧调节特效</p>
+        <div class="font-list" id="font-list"></div>
+        <h3 class="panel-title mt">快速文字样式</h3>
+        <div class="text-presets" id="text-presets"></div>
+      </section>
+
+      <!-- 素材 -->
+      <section class="panel-content" data-panel="elements">
+        <h3 class="panel-title">形状</h3>
+        <div class="shape-grid" id="shape-grid"></div>
+        <h3 class="panel-title mt">贴纸 Emoji</h3>
+        <div class="emoji-tabs" id="emoji-tabs"></div>
+        <div class="emoji-grid" id="emoji-grid"></div>
+      </section>
+
+      <!-- 调整 -->
+      <section class="panel-content" data-panel="adjust">
+        <h3 class="panel-title">背景</h3>
+        <div class="field-row">
+          <button class="seg active" data-bg="solid">纯色</button>
+          <button class="seg" data-bg="gradient">渐变</button>
+        </div>
+        <div class="swatch-grid" id="bg-swatches"></div>
+        <h3 class="panel-title mt">画布</h3>
+        <button class="btn-block ghost" id="btn-clear-canvas">清空画布</button>
+      </section>
+    </aside>
+
+    <!-- ============ 中间画布区 ============ -->
+    <main class="canvas-stage" id="canvas-stage">
+      <div class="canvas-wrap" id="canvas-wrap">
+        <canvas id="canvas" width="1280" height="720"></canvas>
+        <div class="overlay" id="overlay">
+          <div class="guide guide-v hidden" id="guide-v"></div>
+          <div class="guide guide-h hidden" id="guide-h"></div>
+          <div class="sel-box hidden" id="sel-box">
+            <div class="sel-frame"></div>
+            <div class="rot-line"></div>
+            <div class="handle h-tl" data-h="tl"></div>
+            <div class="handle handle-rot" data-h="rot"></div>
+            <div class="handle h-tr" data-h="tr"></div>
+            <div class="handle h-bl" data-h="bl"></div>
+            <div class="handle h-br" data-h="br"></div>
+          </div>
+          <textarea class="text-editor hidden" id="text-editor" rows="1"></textarea>
+        </div>
+      </div>
+      <div class="canvas-foot">
+        <span id="canvas-size-tip">输出尺寸 1280 × 720 px · YouTube 推荐封面比例 16:9</span>
+      </div>
+    </main>
+
+    <!-- ============ 右侧属性面板 ============ -->
+    <aside class="prop-panel" id="prop-panel">
+      <div class="prop-empty" id="prop-empty">
+        <svg viewBox="0 0 24 24"><path d="M12 3l2.5 5.6L20 9.3l-4.2 3.8L17.2 19 12 15.8 6.8 19l1.4-5.9L4 9.3l5.5-.7L12 3z"/></svg>
+        <p>选中画布中的元素<br>在这里调整属性</p>
+      </div>
+      <div class="prop-body hidden" id="prop-body"></div>
+    </aside>
+  </div>
+</div>
+
+<!-- toast -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<!-- 导出弹窗 -->
+<div class="modal-mask hidden" id="export-modal">
+  <div class="modal">
+    <h3>导出封面</h3>
+    <p>标准 YouTube 封面尺寸 1280×720</p>
+    <div class="export-preview"><img id="export-preview-img" alt="preview"></div>
+    <div class="field-row">
+      <label class="seg-choice"><input type="radio" name="export-fmt" value="png" checked> PNG（高清透明友好）</label>
+      <label class="seg-choice"><input type="radio" name="export-fmt" value="jpeg"> JPG（体积小）</label>
+    </div>
+    <div class="field">
+      <label>画质 <span id="export-q-val">0.95</span></label>
+      <input type="range" id="export-q" min="0.5" max="1" step="0.01" value="0.95">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-block ghost" id="btn-export-cancel">取消</button>
+      <button class="btn-block primary" id="btn-export-confirm">下载图片</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
